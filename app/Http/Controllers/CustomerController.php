@@ -2,37 +2,53 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Contracts\CustomerDataInterface;
+use App\Http\Controllers\Controller;
 
 class CustomerController extends Controller
 {
+    public function __construct(
+        private CustomerDataInterface $customerData
+    ) {}
+
     public function index()
     {
+        // Retrieve customers from the database through the existing service.
+        $customerResults = $this->customerData->searchCustomers('', 100);
+
+        // Get the customer records as an array for the Blade dropdown.
+        $customers = $customerResults->items();
+
+        // Use the first customer as the initial PDF Preview customer.
+        $firstCustomer = $customers[0] ?? null;
+
         $customer = (object) [
-            'name'    => 'Printwell Inc.',
-            'code'    => 'PI-SP',
-            'email'   => 'Printwell@printwell.com',
-            'address' => '38 Dansalan St. Mandaluyong City, Metro Manila, Philippines',
+            'name' => $firstCustomer['customer_name'] ?? '',
+            'code' => $firstCustomer['customer_number'] ?? '',
+            'sequence' => $firstCustomer['customer_sequence'] ?? '',
+            'address' => $firstCustomer['address'] ?? '',
+            'email' => '',
         ];
 
-        $transactions = [
-            (object) ['date' => 'Oct 03', 'doc_no' => 'SI-88120', 'debit' => 148500.00, 'credit' => 0.00,      'balance' => 148500.00],
-            (object) ['date' => 'Oct 11', 'doc_no' => 'SI-88214', 'debit' => 62300.00,  'credit' => 0.00,      'balance' => 210800.00],
-            (object) ['date' => 'Oct 18', 'doc_no' => 'OR-44091', 'debit' => 0.00,      'credit' => 148500.00, 'balance' => 62300.00],
-            (object) ['date' => 'Oct 27', 'doc_no' => 'SI-88377', 'debit' => 95750.00,  'credit' => 0.00,      'balance' => 158050.00],
-        ];
+        // Temporary preview data until we connect the report API.
+        $transactions = [];
 
         $report = (object) [
-            'title'      => 'Customers',
-            'date_from'  => '2026-10-01',
-            'date_to'    => '2026-10-31',
-            'date_range' => 'Oct 1 – Oct 31, 2026',
-            'file_name'  => 'PI_Customers.pdf',
-            'file_size'  => '84 KB',
-            'status'     => 'Pending',
-            'total'      => 158050.00,
+            'title' => 'Customers',
+            'date_from' => '',
+            'date_to' => '',
+            'date_range' => '',
+            'file_name' => 'CustomerAccountReport.pdf',
+            'file_size' => 'Pending',
+            'status' => 'Pending',
+            'total' => 0,
         ];
 
-        return view('pages.customers', compact('customer', 'transactions', 'report'));
+        return view('pages.generate-reports', compact(
+            'customers',
+            'customer',
+            'transactions',
+            'report'
+        ));
     }
 }

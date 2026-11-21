@@ -6,13 +6,10 @@ use App\Http\Controllers\CustomerController;
 
 Route::redirect('/', '/customers');
 
-Route::get('/customers', function () {
-    return view('pages.customers');
+Route::get('/customers', function () {return view('pages.customers');
 })->name('customers');
 
 
-Route::get('/generate-reports', function () {
-    return view('pages.generate-reports');
-})->name('generate-reports');
+Route::get('/generate-reports', [CustomerController::class, 'index'])
+    ->name('generate-reports');
 
-Route::get('/customers', [CustomerController::class, 'index'])->name('customers');
