@@ -8,7 +8,6 @@ export default defineConfig({
             input: [
                 'resources/css/app.css',
                 'resources/css/side-nav.css',
-                'resources/css/customers.css',
                 'resources/js/app.js',
                 'resources/js/customers.js',
                 'resources/js/generate-reports.js',
