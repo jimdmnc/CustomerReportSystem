@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Contracts\CustomerDataInterface;
 use App\Http\Controllers\Controller;
 
-class CustomerController extends Controller
+class ReportController extends Controller
 {
     public function __construct(
         private CustomerDataInterface $customerData

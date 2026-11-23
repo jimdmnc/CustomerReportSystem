@@ -7,9 +7,11 @@ export default defineConfig({
         laravel({
             input: [
                 'resources/css/app.css',
-                'resources/css/partials/side-nav.css',
-                'resources/css/pages/customers.css',
+                'resources/css/side-nav.css',
+                'resources/css/customers.css',
                 'resources/js/app.js',
+                'resources/js/customers.js',
+                'resources/js/generate-reports.js',
             ],
             refresh: true,
         }),

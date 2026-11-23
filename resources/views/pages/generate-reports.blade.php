@@ -1,5 +1,4 @@
 @extends('layouts.app')
-
 @section('title', 'Generate Reports')
 
 @section('content')
@@ -21,14 +20,8 @@
                         Customer
                     </label>
 
-                    <input
-                        type="text"
-                        id="customer_search"
-                        list="customer_suggestions"
-                        placeholder="Search customer name or code..."
-                        autocomplete="off"
-                        class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-800 focus:border-blue-500 focus:outline-none"
-                    >
+                    <input type="text" id="customer_search" list="customer_suggestions" placeholder="Search customer name or code..." autocomplete="off"
+                        class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-800 focus:border-blue-500 focus:outline-none">
 
                     <datalist id="customer_suggestions">
                         @foreach($customers as $customerOption)
@@ -78,11 +71,7 @@
                             Date From
                         </label>
 
-                        <input
-                            type="date"
-                            name="date_from"
-                            id="date_from"
-                            required
+                        <input type="date" name="date_from" id="date_from" required
                             class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-800 focus:border-blue-500 focus:outline-none"
                         >
                     </div>
@@ -92,11 +81,7 @@
                             Date To
                         </label>
 
-                        <input
-                            type="date"
-                            name="date_to"
-                            id="date_to"
-                            required
+                        <input type="date" name="date_to" id="date_to" required
                             class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-800 focus:border-blue-500 focus:outline-none"
                         >
                     </div>
