@@ -7,16 +7,11 @@
 }
 
 .nav {
-  display: flex; 
-  text-color: black;
-  align-items: center;    /* Vertically centers icon and text */
-  gap: 12px;              /* Space between icon and text */
-  padding: 12px 16px;     /* 12px controls the top/bottom height of the hover box */
   color: #1a1a1a;
   text-decoration: none;
   transition: background-color 0.2s ease, color 0.2s ease;
 }
 
-.nav:hover{
+.nav:hover {
   background-color: #bdc6cc;
 }

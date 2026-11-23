@@ -8,23 +8,21 @@
     @vite([
         'resources/css/app.css',
         'resources/css/side-nav.css',
-        'resources/css/pages/customers.css',
         'resources/js/app.js'
     ])
-    <script defer src="https://jsdelivr.net"></script>
 </head>
-<body class="bg-gray-100 text-gray-900 min-h-screen flex">
+<!-- resources/views/layouts/app.blade.php -->
+<body class="bg-gray-100 text-gray-900 min-h-screen">
 
     @include('partials.side-nav')
 
-    <div class="flex-1 flex flex-col">
+    <!-- Added md:pl-64 to offset the fixed w-64 sidebar -->
+    <div class="flex-1 flex flex-col min-w-0 md:pl-64">
         
         <!-- Top Navigation Bar -->
-<!-- Top Navigation Bar (Exact same h-16 height as sidebar header) -->
-    <nav class="h-16 bg-white border-b border-gray-200 px-6 flex items-center shrink-0">
-        <span class="font-bold text-xl text-gray-900">@yield('title', 'Customer Reports')</span>
-    </nav>
-
+        <nav class="h-16 bg-white border-b border-gray-200 px-6 flex items-center shrink-0">
+            <span class="font-bold text-xl text-gray-900">@yield('title', 'Customer Reports')</span>
+        </nav>
 
         <!-- Main Content -->
         <main class="flex-1 p-6">
@@ -35,4 +33,6 @@
 
     @stack('scripts')
 </body>
+
+
 </html>

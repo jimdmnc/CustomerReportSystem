@@ -7,13 +7,10 @@ use App\Http\Controllers\CustomersController;
 
 Route::redirect('/', '/customers');
 
-Route::get('/customers', function () {return view('pages.customers');
-})->name('customers');
+Route::get('/customers', function () {return view('pages.customers');})->name('customers');
 
-
-Route::get('/generate-reports', [ReportController::class, 'index'])
-    ->name('generate-reports');
-Route::get('/customers', [CustomersController::class, 'index'])
-    ->name('customers');
+# Pages
+Route::get('/generate-reports', [ReportController::class, 'index']) ->name('generate-reports');
+Route::get('/customers', [CustomersController::class, 'index']) ->name('customers');
 
 

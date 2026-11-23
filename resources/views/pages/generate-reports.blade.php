@@ -35,29 +35,29 @@
                         @endforeach
                     </datalist>
 
-                    <input type="hidden" name="customer_number" id="customer_number">
-                    <input type="hidden" name="customer_sequence" id="customer_sequence">
+                    <!--<input type="hidden" name="customer_number" id="customer_number">
+                    <input type="hidden" name="customer_sequence" id="customer_sequence">-->
                 </div>
 
                 <!-- Customer Code & Email Address -->
                 <div class="grid grid-cols-2 gap-3">
                     <div>
                         <label class="block text-xs font-medium text-gray-600 mb-1">Customer Code</label>
-                        <input type="text" name="customer_code" value="{{ $customer->code }}"
-                               class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-800 focus:border-blue-500 focus:outline-none">
+                        <input type="text" name="customer_code" value="{{ old('customer_code') }}" class="w-full rounded-lg border 
+                            border-gray-300 px-3 py-2 text-sm text-gray-800 focus:border-blue-500 focus:outline-none">
                     </div>
                     <div>
                         <label class="block text-xs font-medium text-gray-600 mb-1">Email Address</label>
-                        <input type="email" name="email" 
-                               class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-800 focus:border-blue-500 focus:outline-none">
+                        <input type="email" name="email" class="w-full rounded-lg border 
+                            border-gray-300 px-3 py-2 text-sm text-gray-800 focus:border-blue-500 focus:outline-none">
                     </div>
                 </div>
 
                 <!-- Report Type -->
                 <div>
                     <label class="block text-xs font-medium text-gray-600 mb-1">Report Type</label>
-                    <select name="report_type"
-                            class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-800 focus:border-blue-500 focus:outline-none">
+                    <select name="report_type" class="w-full rounded-lg border 
+                            border-gray-300 bg-white px-3 py-2 text-sm text-gray-800 focus:border-blue-500 focus:outline-none">
                         <option value="soa" selected>Statement of Account</option>
                         <option value="invoice_summary">Invoice Summary</option>
                         <option value="aging_report">Aging Report</option>
@@ -71,8 +71,8 @@
                             Date From
                         </label>
 
-                        <input type="date" name="date_from" id="date_from" required
-                            class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-800 focus:border-blue-500 focus:outline-none"
+                        <input type="date" name="date_from" id="date_from" required class="w-full rounded-lg border
+                            border-gray-300 px-3 py-2 text-sm text-gray-800 focus:border-blue-500 focus:outline-none"
                         >
                     </div>
 
@@ -81,19 +81,19 @@
                             Date To
                         </label>
 
-                        <input type="date" name="date_to" id="date_to" required
-                            class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-800 focus:border-blue-500 focus:outline-none"
+                        <input type="date" name="date_to" id="date_to" required class="w-full rounded-lg border 
+                            border-gray-300 px-3 py-2 text-sm text-gray-800 focus:border-blue-500 focus:outline-none"
                         >
                     </div>
                 </div>
                 <!-- Buttons -->
                 <div class="flex items-center gap-3 pt-2">
-                    <button type="submit"
-                            class="bg-gray-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition">
+                    <button type="submit" class="bg-gray-600 hover:bg-blue-700 text-white text-sm font-medium 
+                            px-4 py-2 rounded-lg transition">
                         Generate PDF
                     </button>
-                    <button type="reset"
-                            class="bg-white hover:bg-gray-50 text-gray-700 text-sm font-medium px-4 py-2 rounded-lg border border-gray-300 transition">
+                    <button type="reset" class="bg-white hover:bg-gray-50 text-gray-700 text-sm font-medium 
+                            px-4 py-2 rounded-lg border border-gray-300 transition">
                         Reset
                     </button>
                 </div>
@@ -110,58 +110,62 @@
                 <!-- Recipient Email -->
                 <div>
                     <label class="block text-xs font-medium text-gray-600 mb-1">Recipient Email</label>
-                    <input type="email" name="recipient_email" 
-                           class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-800 focus:border-blue-500 focus:outline-none">
+                    <input type="email" name="recipient_email" class="w-full rounded-lg border 
+                        border-gray-300 px-3 py-2 text-sm text-gray-800 focus:border-blue-500 focus:outline-none">
                 </div>
 
                 <!-- Subject -->
                 <div>
                     <label class="block text-xs font-medium text-gray-600 mb-1">Subject</label>
-                    <input type="text" name="subject" 
-                           class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-800 focus:border-blue-500 focus:outline-none">
+                    <input type="text" name="subject" class="w-full rounded-lg border 
+                        border-gray-300 px-3 py-2 text-sm text-gray-800 focus:border-blue-500 focus:outline-none">
                 </div>
 
                 <!-- Message -->
                 <div>
                     <label class="block text-xs font-medium text-gray-600 mb-1">Message</label>
-                    <textarea name="message" rows="5"
-                              class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-800 focus:border-blue-500 focus:outline-none">
+                    <textarea name="message" rows="5" class="w-full rounded-lg border 
+                        border-gray-300 px-3 py-2 text-sm text-gray-800 focus:border-blue-500 focus:outline-none">
                             
                     </textarea>
                 </div>
 
                 <!-- Attachment Badge & Status -->
-                <div class="flex items-center justify-between gap-3">
-                    <div id="pdf-filename-badge" class="bg-blue-50 text-blue-700 border border-blue-200 rounded-lg px-3 py-1.5 text-xs font-medium">
+                <div class="flex items-start justify-between gap-3">
+                    <div id="pdf-filename-badge"
+                        class="min-w-0 break-all bg-blue-50 text-blue-700 border border-blue-200 rounded-lg px-3 py-1.5 text-xs font-medium">
                         {{ $report->file_name }} ({{ $report->file_size }})
                     </div>
-                    <div class="text-xs text-gray-600">
+
+                    <div class="text-xs text-gray-600 shrink-0 whitespace-nowrap pt-1">
                         Status:
                         <span class="inline-block bg-amber-100 text-amber-800 font-semibold px-2 py-0.5 rounded">
-                        {{ $report->status }}
+                            {{ $report->status }}
                         </span>
                     </div>
                 </div>
 
 
+
                 <!-- Buttons -->
                 <div class="flex items-center gap-3 pt-2">
-                    <button type="submit"
-                            class="bg-gray-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition">
+                    <button type="submit" class="bg-gray-600 hover:bg-blue-700 text-white text-sm font-medium 
+                            px-4 py-2 rounded-lg transition">
                         Send Email
                     </button>
-                    <button type="button"
-                            class="bg-white hover:bg-gray-50 text-gray-700 text-sm font-medium px-4 py-2 rounded-lg border border-gray-300 transition">
+                    <button type="button" class="bg-white hover:bg-gray-50 text-gray-700 text-sm font-medium 
+                            px-4 py-2 rounded-lg border border-gray-300 transition">
                         Save Draft
                     </button>
                 </div>
+
             </form>
         </div>
 
     </div>
 
     <!-- RIGHT COLUMN PDF Preview -->
-    <div class="card bg-white lg:col-span-8 rounded-xl shadow-sm p-6">
+    <div class="card bg-white lg:col-span-8 rounded-xl shadow-sm p-6 overflow-x-auto">
         <h2 class="text-base font-bold text-gray-900 mb-4">PDF Preview</h2>
 
         <!-- Outer Light Frame -->

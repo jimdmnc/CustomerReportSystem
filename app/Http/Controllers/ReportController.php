@@ -39,7 +39,7 @@ class ReportController extends Controller
             'date_to' => '',
             'date_range' => '',
             'file_name' => 'CustomerAccountReport.pdf',
-            'file_size' => 'Pending',
+            'file_size' => '38 KB',
             'status' => 'Pending',
             'total' => 0,
         ];
