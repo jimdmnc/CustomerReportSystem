@@ -6,7 +6,7 @@ use App\Http\Controllers\Reports\InvoicePreviewController;
 use Illuminate\Support\Facades\Route;
 
 // Customers page
-Route::view('/customers', 'customers')
+Route::view('/customers', 'pages.customers')
     ->name('customers');
 
 // Generate Reports
