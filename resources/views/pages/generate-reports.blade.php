@@ -50,22 +50,30 @@
                 <div class="grid grid-cols-2 gap-3">
                     <div>
                         <label class="block text-xs font-medium text-gray-600 mb-1">Customer Code</label>
-                        <input type="text" name="customer_code" value="{{ old('customer_code') }}" class="w-full rounded-lg border 
-                            border-gray-300 px-3 py-2 text-sm text-gray-800 focus:border-blue-500 focus:outline-none">
+                        <input
+                            type="text"
+                            id="customer_code"
+                            readonly
+                            placeholder="Select a customer"
+                            class="w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-sm text-gray-600"
+                        >
                     </div>
                     <div>
                         <label class="block text-xs font-medium text-gray-600 mb-1">Email Address</label>
-                        <input type="email" name="email" class="w-full rounded-lg border 
-                            border-gray-300 px-3 py-2 text-sm text-gray-800 focus:border-blue-500 focus:outline-none">
+                        <input type="email" name="email" id="email"
+                               class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-800 focus:border-blue-500 focus:outline-none">
                     </div>
                 </div>
 
                 <!-- Report Type -->
                 <div>
                     <label class="block text-xs font-medium text-gray-600 mb-1">Report Type</label>
-                    <select name="report_type" class="w-full rounded-lg border 
-                            border-gray-300 bg-white px-3 py-2 text-sm text-gray-800 focus:border-blue-500 focus:outline-none">
-                        <option value="soa" selected>Statement of Account</option>
+                    <select
+                        name="report_type"
+                        id="report_type"
+                        class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-800 focus:border-blue-500 focus:outline-none"
+                    >
+                        <option value="customer_account_report" selected>Customer Account Report</option>
                         <option value="invoice_summary">Invoice Summary</option>
                         <option value="aging_report">Aging Report</option>
                     </select>
@@ -74,33 +82,25 @@
                 <!-- Date From & Date To (optional filters for the preview) -->
                 <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <label class="block text-xs font-medium text-gray-600 mb-1">
-                            Date From
-                        </label>
-
-                        <input type="date" name="date_from" id="date_from" required class="w-full rounded-lg border
-                            border-gray-300 px-3 py-2 text-sm text-gray-800 focus:border-blue-500 focus:outline-none"
-                        >
+                        <label class="block text-xs font-medium text-gray-600 mb-1">Date From</label>
+                        <input type="date" name="date_from" id="date_from"
+                               class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-800 focus:border-blue-500 focus:outline-none">
                     </div>
                     <div>
-                        <label class="block text-xs font-medium text-gray-600 mb-1">
-                            Date To
-                        </label>
-
-                        <input type="date" name="date_to" id="date_to" required class="w-full rounded-lg border 
-                            border-gray-300 px-3 py-2 text-sm text-gray-800 focus:border-blue-500 focus:outline-none"
-                        >
+                        <label class="block text-xs font-medium text-gray-600 mb-1">Date To</label>
+                        <input type="date" name="date_to" id="date_to"
+                               class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-800 focus:border-blue-500 focus:outline-none">
                     </div>
                 </div>
 
                 <!-- Buttons -->
                 <div class="flex items-center gap-3 pt-2">
-                    <button type="submit" class="bg-gray-600 hover:bg-blue-700 text-white text-sm font-medium 
-                            px-4 py-2 rounded-lg transition">
+                    <button type="submit"
+                            class="bg-gray-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition">
                         Generate PDF
                     </button>
-                    <button type="reset" class="bg-white hover:bg-gray-50 text-gray-700 text-sm font-medium 
-                            px-4 py-2 rounded-lg border border-gray-300 transition">
+                    <button type="reset"
+                            class="bg-white hover:bg-gray-50 text-gray-700 text-sm font-medium px-4 py-2 rounded-lg border border-gray-300 transition">
                         Reset
                     </button>
                 </div>
@@ -116,14 +116,14 @@
 
                 <div>
                     <label class="block text-xs font-medium text-gray-600 mb-1">Recipient Email</label>
-                    <input type="email" name="recipient_email" class="w-full rounded-lg border 
-                        border-gray-300 px-3 py-2 text-sm text-gray-800 focus:border-blue-500 focus:outline-none">
+                    <input type="email" name="recipient_email" id="recipient_email"
+                           class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-800 focus:border-blue-500 focus:outline-none">
                 </div>
 
                 <div>
                     <label class="block text-xs font-medium text-gray-600 mb-1">Subject</label>
-                    <input type="text" name="subject" class="w-full rounded-lg border 
-                        border-gray-300 px-3 py-2 text-sm text-gray-800 focus:border-blue-500 focus:outline-none">
+                    <input type="text" name="subject" id="subject"
+                           class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-800 focus:border-blue-500 focus:outline-none">
                 </div>
 
                 <div>
@@ -136,31 +136,29 @@
                     <div id="pdf-filename-badge" class="bg-blue-50 text-blue-700 border border-blue-200 rounded-lg px-3 py-1.5 text-xs font-medium">
                         No report generated yet
                     </div>
-
-                    <div class="text-xs text-gray-600 shrink-0 whitespace-nowrap pt-1">
+                    <div class="text-xs text-gray-600">
                         Status:
                         <span id="report-status" class="inline-block bg-amber-100 text-amber-800 font-semibold px-2 py-0.5 rounded">Pending</span>
                     </div>
                 </div>
 
                 <div class="flex items-center gap-3 pt-2">
-                    <button type="submit" class="bg-gray-600 hover:bg-blue-700 text-white text-sm font-medium 
-                            px-4 py-2 rounded-lg transition">
+                    <button type="submit"
+                            class="bg-gray-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition">
                         Send Email
                     </button>
-                    <button type="button" class="bg-white hover:bg-gray-50 text-gray-700 text-sm font-medium 
-                            px-4 py-2 rounded-lg border border-gray-300 transition">
+                    <button type="button"
+                            class="bg-white hover:bg-gray-50 text-gray-700 text-sm font-medium px-4 py-2 rounded-lg border border-gray-300 transition">
                         Save Draft
                     </button>
                 </div>
-
             </form>
         </div>
 
     </div>
 
     <!-- RIGHT COLUMN PDF Preview -->
-    <div class="card bg-white lg:col-span-8 rounded-xl shadow-sm p-6 overflow-x-auto">
+    <div class="card bg-white lg:col-span-8 rounded-xl shadow-sm p-6">
         <h2 class="text-base font-bold text-gray-900 mb-4">PDF Preview</h2>
 
         <div class="bg-slate-50 border border-slate-200 rounded-xl p-6">
