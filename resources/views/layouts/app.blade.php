@@ -16,15 +16,14 @@
 
     @include('partials.side-nav')
 
-    <!-- Added md:pl-64 to offset the fixed w-64 sidebar -->
-    <div class="flex-1 flex flex-col min-w-0 md:pl-64">
-        
-        <!-- Top Navigation Bar -->
+    <div class="flex-1 flex flex-col">
+
         <nav class="h-16 bg-white border-b border-gray-200 px-6 flex items-center shrink-0">
-            <span class="font-bold text-xl text-gray-900">@yield('title', 'Customer Reports')</span>
+            <span class="font-bold text-xl text-gray-900">
+                @yield('title', 'Customer Reports')
+            </span>
         </nav>
 
-        <!-- Main Content -->
         <main class="flex-1 p-6">
             @yield('content')
         </main>
@@ -33,6 +32,4 @@
 
     @stack('scripts')
 </body>
-
-
 </html>

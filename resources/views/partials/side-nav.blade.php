@@ -15,9 +15,9 @@
                 <span>Customers</span>
             </a>
 
-            <a href="{{ route('generate-reports') }}"
+           <a href="{{ route('reports.index') }}"
                class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition
-                      {{ request()->routeIs('generate-reports') ? 'bg-blue-50 text-blue-600 font-semibold' : 'text-gray-700 hover:bg-gray-100' }}">
+                      {{ request()->routeIs('reports.*') ? 'bg-blue-50 text-black-600 font-semibold' : 'text-gray-700 hover:bg-gray-100' }}">
                 <i class="bi bi-clipboard-data-fill"></i>
                 <span>Generate Report</span>
             </a>

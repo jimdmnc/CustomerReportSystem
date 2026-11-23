@@ -1,16 +1,21 @@
 <?php
 
+use App\Http\Controllers\Reports\CustomerSearchController;
+use App\Http\Controllers\Reports\ReportPageController;
+use App\Http\Controllers\Reports\InvoicePreviewController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\ReportController;
-use App\Http\Controllers\CustomersController;
 
+// Customers page
+Route::view('/customers', 'customers')
+    ->name('customers');
 
-Route::redirect('/', '/customers');
+// Generate Reports
+Route::prefix('generate-reports')->name('reports.')->group(function () {
+    Route::get('/', ReportPageController::class)->name('index');
 
-Route::get('/customers', function () {return view('pages.customers');})->name('customers');
-
-# Pages
-Route::get('/generate-reports', [ReportController::class, 'index']) ->name('generate-reports');
-Route::get('/customers', [CustomersController::class, 'index']) ->name('customers');
-
-
+    Route::get('/customers/search', CustomerSearchController::class)
+        ->name('customers.search');
+    
+    Route::get('/invoices', InvoicePreviewController::class)
+        ->name('invoices.preview');  
+});

@@ -1,9 +1,13 @@
 @extends('layouts.app')
+
 @section('title', 'Generate Reports')
 
 @section('content')
 
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+    <div id="report-page"
+         data-search-url="{{ route('reports.customers.search') }}"
+         data-invoices-url="{{ route('reports.invoices.preview') }}"
+         class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
 
     <!-- Report Request & Email Management -->
     <div class="lg:col-span-4 space-y-6">
@@ -12,31 +16,34 @@
         <div class="card bg-white rounded-xl shadow-sm p-6">
             <h2 class="text-base font-bold text-gray-900 mb-4">Report Details</h2>
 
-            <form action="#" method="POST" class="space-y-4">
+            <form id="report_form" action="#" method="POST" class="space-y-4">
                 @csrf
 
-                <div>
-                    <label class="block text-xs font-medium text-gray-600 mb-1">
-                        Customer
-                    </label>
+                <!-- Customer Search -->
+                <div class="relative">
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Customer</label>
 
-                    <input type="text" id="customer_search" list="customer_suggestions" placeholder="Search customer name or code..." autocomplete="off"
-                        class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-800 focus:border-blue-500 focus:outline-none">
+                    <input
+                        type="text"
+                        id="customer_search"
+                        placeholder="Search customer name or code..."
+                        autocomplete="off"
+                        class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-800 focus:border-blue-500 focus:outline-none"
+                    >
 
-                    <datalist id="customer_suggestions">
-                        @foreach($customers as $customerOption)
-                            <option
-                                value="{{ $customerOption['customer_name'] }} ({{ $customerOption['customer_number'] }})"
-                                data-customer-number="{{ $customerOption['customer_number'] }}"
-                                data-customer-sequence="{{ $customerOption['customer_sequence'] }}"
-                                data-customer-name="{{ $customerOption['customer_name'] }}"
-                                data-customer-address="{{ $customerOption['address'] }}"
-                            ></option>
-                        @endforeach
-                    </datalist>
+                    <!-- Search Results (filled by JS from the server) -->
+                    <div
+                        id="customer_suggestions"
+                        class="absolute z-50 mt-1 hidden w-full overflow-hidden rounded-lg border border-gray-200 bg-white shadow-lg"
+                    >
+                        <div id="customer_suggestions_list" class="max-h-60 overflow-y-auto"></div>
 
-                    <!--<input type="hidden" name="customer_number" id="customer_number">
-                    <input type="hidden" name="customer_sequence" id="customer_sequence">-->
+                        <div id="customer_status" class="hidden px-3 py-3 text-center text-sm text-gray-500"></div>
+                    </div>
+
+                    <!-- Selected Customer Values -->
+                    <input type="hidden" name="customer_number" id="customer_number">
+                    <input type="hidden" name="customer_sequence" id="customer_sequence">
                 </div>
 
                 <!-- Customer Code & Email Address -->
@@ -64,7 +71,7 @@
                     </select>
                 </div>
 
-                <!-- Date From & Date To -->
+                <!-- Date From & Date To (optional filters for the preview) -->
                 <div class="grid grid-cols-2 gap-3">
                     <div>
                         <label class="block text-xs font-medium text-gray-600 mb-1">
@@ -75,7 +82,6 @@
                             border-gray-300 px-3 py-2 text-sm text-gray-800 focus:border-blue-500 focus:outline-none"
                         >
                     </div>
-
                     <div>
                         <label class="block text-xs font-medium text-gray-600 mb-1">
                             Date To
@@ -86,6 +92,7 @@
                         >
                     </div>
                 </div>
+
                 <!-- Buttons -->
                 <div class="flex items-center gap-3 pt-2">
                     <button type="submit" class="bg-gray-600 hover:bg-blue-700 text-white text-sm font-medium 
@@ -100,54 +107,42 @@
             </form>
         </div>
 
-        <!-- Card 2: Email Management -->
+        <!-- Card 2: Email Management (not wired to a backend yet) -->
         <div class="card bg-white rounded-xl shadow-sm p-6">
             <h2 class="text-base font-bold text-gray-900 mb-4">Email Management</h2>
 
-            <form action="#" method="POST" class="space-y-4">
+            <form id="email_form" action="#" method="POST" class="space-y-4">
                 @csrf
 
-                <!-- Recipient Email -->
                 <div>
                     <label class="block text-xs font-medium text-gray-600 mb-1">Recipient Email</label>
                     <input type="email" name="recipient_email" class="w-full rounded-lg border 
                         border-gray-300 px-3 py-2 text-sm text-gray-800 focus:border-blue-500 focus:outline-none">
                 </div>
 
-                <!-- Subject -->
                 <div>
                     <label class="block text-xs font-medium text-gray-600 mb-1">Subject</label>
                     <input type="text" name="subject" class="w-full rounded-lg border 
                         border-gray-300 px-3 py-2 text-sm text-gray-800 focus:border-blue-500 focus:outline-none">
                 </div>
 
-                <!-- Message -->
                 <div>
                     <label class="block text-xs font-medium text-gray-600 mb-1">Message</label>
-                    <textarea name="message" rows="5" class="w-full rounded-lg border 
-                        border-gray-300 px-3 py-2 text-sm text-gray-800 focus:border-blue-500 focus:outline-none">
-                            
-                    </textarea>
+                    <textarea name="message" id="message" rows="5"
+                              class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-800 focus:border-blue-500 focus:outline-none"></textarea>
                 </div>
 
-                <!-- Attachment Badge & Status -->
-                <div class="flex items-start justify-between gap-3">
-                    <div id="pdf-filename-badge"
-                        class="min-w-0 break-all bg-blue-50 text-blue-700 border border-blue-200 rounded-lg px-3 py-1.5 text-xs font-medium">
-                        {{ $report->file_name }} ({{ $report->file_size }})
+                <div class="flex items-center justify-between gap-3">
+                    <div id="pdf-filename-badge" class="bg-blue-50 text-blue-700 border border-blue-200 rounded-lg px-3 py-1.5 text-xs font-medium">
+                        No report generated yet
                     </div>
 
                     <div class="text-xs text-gray-600 shrink-0 whitespace-nowrap pt-1">
                         Status:
-                        <span class="inline-block bg-amber-100 text-amber-800 font-semibold px-2 py-0.5 rounded">
-                            {{ $report->status }}
-                        </span>
+                        <span id="report-status" class="inline-block bg-amber-100 text-amber-800 font-semibold px-2 py-0.5 rounded">Pending</span>
                     </div>
                 </div>
 
-
-
-                <!-- Buttons -->
                 <div class="flex items-center gap-3 pt-2">
                     <button type="submit" class="bg-gray-600 hover:bg-blue-700 text-white text-sm font-medium 
                             px-4 py-2 rounded-lg transition">
@@ -168,176 +163,295 @@
     <div class="card bg-white lg:col-span-8 rounded-xl shadow-sm p-6 overflow-x-auto">
         <h2 class="text-base font-bold text-gray-900 mb-4">PDF Preview</h2>
 
-        <!-- Outer Light Frame -->
         <div class="bg-slate-50 border border-slate-200 rounded-xl p-6">
-            
-            <!-- Inner Paper Document -->
             <div class="bg-white border border-gray-200 shadow-md rounded-sm p-8">
-                
+
                 <!-- Document Header -->
                 <div class="flex justify-between items-start mb-6">
                     <div>
-
                         <h3 class="text-base font-bold tracking-wide text-gray-900 uppercase">
                             Customers of Printwell
                         </h3>
 
                         <div class="mt-2 text-xs text-gray-600 space-y-0.5">
-                            <p id="preview-customer-name" class="font-medium text-gray-800">
-                                {{ $customer->name ?: 'Select a customer' }}
-                            </p>
-
-                            <p>
-                                Customer Code:
-                                <span id="preview-customer-code">
-                                    {{ $customer->code ?: '---' }}
-                                </span>
-                            </p>
-
-                            <p id="preview-customer-address">
-                                {{ $customer->address ?: '---' }}
-                            </p>
+                            <p id="preview-customer-name" class="font-medium text-gray-800">Select a customer</p>
+                            <p>Customer Code: <span id="preview-customer-code">---</span></p>
+                            <p id="preview-customer-address">---</p>
                         </div>
+                    </div>
 
-                    <span id="preview-date-range" class="text-xs text-gray-500">
-                        Select report dates
-                    </span>
+                    <div class="text-right text-xs text-gray-500 space-y-0.5">
+                        <p id="preview-date-range">All dates</p>
+                        <p id="preview-summary"></p>
+                    </div>
                 </div>
 
-                <!-- Transactions Table -->
+                <!-- Invoice Lines Table -->
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse text-xs">
                         <thead>
                             <tr class="border-b border-gray-200 text-gray-500 font-medium">
-                                <th class="py-2.5 pr-4">Date</th>
-                                <th class="py-2.5 px-4">Doc No.</th>
-                                <th class="py-2.5 px-4">Debit</th>
-                                <th class="py-2.5 px-4">Credit</th>
-                                <th class="py-2.5 pl-4">Balance</th>
+                                <th class="py-2.5 pr-3">Inv. Date</th>
+                                <th class="py-2.5 px-3">Invoice No.</th>
+                                <th class="py-2.5 px-3">Line</th>
+                                <th class="py-2.5 px-3">Cust. PO</th>
+                                <th class="py-2.5 px-3">Item</th>
+                                <th class="py-2.5 px-3">DO No.</th>
+                                <th class="py-2.5 px-3 text-right">Qty</th>
+                                <th class="py-2.5 px-3 text-right">Unit Price</th>
+                                <th class="py-2.5 pl-3 text-right">Amount</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-gray-100 text-gray-700">
-                            @foreach($transactions as $row)
-                                <tr>
-                                    <td>{{ $row->date }}</td>
-                                    <td>{{ $row->doc_no }}</td>
-                                    <td>${{ number_format($row->debit, 2) }}</td>
-                                    <td>${{ number_format($row->credit, 2) }}</td>
-                                    <td>${{ number_format($row->balance, 2) }}</td>
-                                </tr>
-                            @endforeach
+
+                        <tbody id="transaction-table-body" class="divide-y divide-gray-100 text-gray-700">
+                            <tr>
+                                <td colspan="9" class="py-6 text-center text-gray-400">
+                                    Select a customer to display invoice records.
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
             </div>
         </div>
     </div>
-</div>  
-@endsection
+</div>
+
 <script>
+// Customer search (step 1) + date filter on inv_date (step 2).
 document.addEventListener('DOMContentLoaded', function () {
 
-    // Customer elements
-    const customerSearch = document.getElementById('customer_search');
-    const customerSuggestions = document.getElementById('customer_suggestions');
-    const customerNumber = document.getElementById('customer_number');
-    const customerSequence = document.getElementById('customer_sequence');
+    const root = document.getElementById('report-page');
+    const urls = { search: root.dataset.searchUrl, invoices: root.dataset.invoicesUrl };
 
-    // Preview elements
-    const previewName = document.getElementById('preview-customer-name');
-    const previewCode = document.getElementById('preview-customer-code');
-    const previewAddress = document.getElementById('preview-customer-address');
-    const previewDateRange = document.getElementById('preview-date-range');
+    const $ = id => document.getElementById(id);
 
-    // Date elements
-    const dateFrom = document.getElementById('date_from');
-    const dateTo = document.getElementById('date_to');
+    const searchInput      = $('customer_search');
+    const suggestionsBox   = $('customer_suggestions');
+    const suggestionsList  = $('customer_suggestions_list');
+    const statusBox        = $('customer_status');
+    const customerNumber   = $('customer_number');
+    const customerSequence = $('customer_sequence');
+    const customerCode     = $('customer_code');
+    const dateFrom         = $('date_from');
+    const dateTo           = $('date_to');
+    const reportForm       = $('report_form');
 
-    // Customer selection
-    customerSearch.addEventListener('input', function () {
+    const previewName      = $('preview-customer-name');
+    const previewCode      = $('preview-customer-code');
+    const previewAddress   = $('preview-customer-address');
+    const previewDates     = $('preview-date-range');
+    const previewSummary   = $('preview-summary');
+    const tableBody        = $('transaction-table-body');
 
-        const selectedOption = Array.from(customerSuggestions.options)
-            .find(option => option.value === this.value);
+    let selectedCustomer = null;
+    let searchTimer = null;
+    let searchAbort = null;
+    let invoiceAbort = null;
 
-        if (!selectedOption) {
-            customerNumber.value = '';
-            customerSequence.value = '';
+    // ---------- Helpers ----------
+    const showSuggestions = () => suggestionsBox.classList.remove('hidden');
+    const hideSuggestions = () => suggestionsBox.classList.add('hidden');
 
-            previewName.textContent = 'Select a valid customer';
-            previewCode.textContent = '---';
-            previewAddress.textContent = '---';
+    function escapeHtml(value) {
+        return String(value ?? '').replace(/[&<>"']/g, ch => ({
+            '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+        }[ch]));
+    }
 
-            return;
-        }
-
-        customerNumber.value = selectedOption.dataset.customerNumber;
-        customerSequence.value = selectedOption.dataset.customerSequence;
-
-        previewName.textContent = selectedOption.dataset.customerName;
-        previewCode.textContent = selectedOption.dataset.customerNumber;
-        previewAddress.textContent = selectedOption.dataset.customerAddress;
-    });
-
-    // Format date for PDF Preview
     function formatDate(value) {
         if (!value) return '';
+        const [y, m, d] = value.split('-').map(Number);
+        return new Date(y, m - 1, d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    }
 
-        const [year, month, day] = value.split('-').map(Number);
-        const date = new Date(year, month - 1, day);
+    const formatMoney = n => Number(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const formatQty   = n => Number(n).toLocaleString('en-US', { maximumFractionDigits: 2 });
+    const formatPrice = n => Number(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 5 });
 
-        return date.toLocaleDateString('en-US', {
-            month: 'short',
-            day: 'numeric',
-            year: 'numeric'
+    async function getJson(url, params, signal) {
+        const response = await fetch(`${url}?${new URLSearchParams(params)}`, {
+            headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+            signal,
+        });
+        if (!response.ok) throw new Error(response.status);
+        return (await response.json()).data;
+    }
+
+    function setTableMessage(message) {
+        tableBody.innerHTML = `<tr><td colspan="9" class="py-6 text-center text-gray-400">${escapeHtml(message)}</td></tr>`;
+    }
+
+    function setCustomerPreview(name, code, address) {
+        previewName.textContent    = name;
+        previewCode.textContent    = code;
+        previewAddress.textContent = address;
+    }
+
+    // ---------- Selection ----------
+    function clearSelection() {
+        selectedCustomer       = null;
+        customerNumber.value   = '';
+        customerSequence.value = '';
+        customerCode.value     = '';
+        previewSummary.textContent = '';
+        setCustomerPreview('Select a customer', '---', '---');
+        setTableMessage('Select a customer to display invoice records.');
+    }
+
+    function selectCustomer(customer) {
+        selectedCustomer       = customer;
+        customerNumber.value   = customer.customer_number;
+        customerSequence.value = customer.customer_sequence;
+        customerCode.value     = customer.customer_number;
+        searchInput.value      = customer.customer_name;
+        setCustomerPreview(customer.customer_name, customer.customer_number, '---');
+        hideSuggestions();
+        loadInvoices();
+    }
+
+    // ---------- Customer search ----------
+    function renderSuggestions(customers) {
+        suggestionsList.innerHTML = '';
+        statusBox.classList.toggle('hidden', customers.length > 0);
+        if (!customers.length) statusBox.textContent = 'No matching customers found.';
+
+        customers.forEach(customer => {
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className = 'w-full border-b border-gray-100 px-3 py-2 text-left hover:bg-blue-50 last:border-b-0';
+            button.innerHTML = `
+                <div class="text-sm font-medium text-gray-800">${escapeHtml(customer.customer_name)}</div>
+                <div class="text-xs text-gray-500">${escapeHtml(customer.customer_number)} · Seq ${customer.customer_sequence}</div>`;
+            button.addEventListener('click', () => selectCustomer(customer));
+            suggestionsList.appendChild(button);
         });
     }
 
-    // Update preview date range
-    function updateDatePreview() {
+    async function runSearch(term) {
+        if (searchAbort) searchAbort.abort();
+        searchAbort = new AbortController();
 
-        const from = dateFrom.value;
-        const to = dateTo.value;
+        suggestionsList.innerHTML = '';
+        statusBox.textContent = 'Searching...';
+        statusBox.classList.remove('hidden');
+        showSuggestions();
 
-        if (!from || !to) {
-            previewDateRange.textContent = 'Select report dates';
-            return;
+        try {
+            renderSuggestions(await getJson(urls.search, { q: term }, searchAbort.signal));
+        } catch (error) {
+            if (error.name === 'AbortError') return;
+            statusBox.textContent = 'Could not load customers. Please try again.';
         }
-
-        previewDateRange.textContent =
-            `${formatDate(from)} – ${formatDate(to)}`;
     }
 
-    // Date validation and preview
-    dateFrom.addEventListener('change', function () {
+    searchInput.addEventListener('input', function () {
+        clearSelection();
+        clearTimeout(searchTimer);
+        const term = searchInput.value.trim();
+        if (term.length < 2) return hideSuggestions();
+        searchTimer = setTimeout(() => runSearch(term), 300);
+    });
 
-        dateTo.min = this.value;
+    searchInput.addEventListener('keydown', e => { if (e.key === 'Escape') hideSuggestions(); });
 
-        if (dateTo.value && dateTo.value < this.value) {
-            dateTo.value = '';
+    document.addEventListener('click', function (event) {
+        if (!searchInput.contains(event.target) && !suggestionsBox.contains(event.target)) hideSuggestions();
+    });
+
+    // ---------- Date filter (inv_date) ----------
+    function updateDatePreview() {
+        if (dateFrom.value && dateTo.value) {
+            previewDates.textContent = `${formatDate(dateFrom.value)} – ${formatDate(dateTo.value)}`;
+        } else if (dateFrom.value) {
+            previewDates.textContent = `From ${formatDate(dateFrom.value)}`;
+        } else if (dateTo.value) {
+            previewDates.textContent = `Up to ${formatDate(dateTo.value)}`;
+        } else {
+            previewDates.textContent = 'All dates';
+        }
+    }
+
+    function renderInvoices(lines) {
+        if (!lines.length) {
+            previewSummary.textContent = '0 lines';
+            return setTableMessage('No invoice records found for the selected dates.');
         }
 
+        if (lines[0].address) previewAddress.textContent = lines[0].address;
+
+        const currency = lines[0].currency || '';
+        const total = lines.reduce((sum, line) => sum + line.line_amount, 0);
+
+        tableBody.innerHTML = lines.map(line => `
+            <tr>
+                <td class="py-2.5 pr-3 whitespace-nowrap">${escapeHtml(formatDate(line.inv_date))}</td>
+                <td class="py-2.5 px-3 whitespace-nowrap">${escapeHtml(line.inv_num)}</td>
+                <td class="py-2.5 px-3">${line.inv_line}</td>
+                <td class="py-2.5 px-3">${escapeHtml(line.cust_po || '—')}</td>
+                <td class="py-2.5 px-3">${escapeHtml(line.item || '—')}</td>
+                <td class="py-2.5 px-3">${escapeHtml(line.do_num || '—')}</td>
+                <td class="py-2.5 px-3 text-right">${formatQty(line.qty_invoiced)}</td>
+                <td class="py-2.5 px-3 text-right">${formatPrice(line.unit_price)}</td>
+                <td class="py-2.5 pl-3 text-right font-medium">${formatMoney(line.line_amount)}</td>
+            </tr>`).join('') + `
+            <tr class="border-t-2 border-gray-300 font-semibold text-gray-900">
+                <td colspan="8" class="py-3 px-3 text-right">Total ${escapeHtml(currency)}</td>
+                <td class="py-3 pl-3 text-right">${formatMoney(total)}</td>
+            </tr>`;
+
+        previewSummary.textContent = `${lines.length} line${lines.length === 1 ? '' : 's'}`;
+    }
+
+    async function loadInvoices() {
+        if (!selectedCustomer) return setTableMessage('Select a customer first.');
+
+        if (invoiceAbort) invoiceAbort.abort();
+        invoiceAbort = new AbortController();
+
+        const params = { customer_name: selectedCustomer.customer_name };
+        if (dateFrom.value) params.date_from = dateFrom.value;   // inv_date >= date_from
+        if (dateTo.value)   params.date_to   = dateTo.value;     // inv_date <= date_to (whole day)
+
+        setTableMessage('Loading invoice records...');
+
+        try {
+            renderInvoices(await getJson(urls.invoices, params, invoiceAbort.signal));
+        } catch (error) {
+            if (error.name === 'AbortError') return;
+            setTableMessage('Could not load invoice records. Please try again.');
+        }
+    }
+
+    dateFrom.addEventListener('change', function () {
+        dateTo.min = this.value;
+        if (dateTo.value && dateTo.value < this.value) dateTo.value = '';
         updateDatePreview();
+        loadInvoices();
     });
 
     dateTo.addEventListener('change', function () {
-
         if (dateFrom.value && this.value < dateFrom.value) {
             alert('Date To cannot be earlier than Date From.');
             this.value = '';
         }
-
         updateDatePreview();
+        loadInvoices();
     });
 
-    // Initialize customer field from the server-selected customer
-    const initialCustomer = Array.from(customerSuggestions.options)
-        .find(option =>
-            option.dataset.customerNumber === customerNumber.value
-        );
+    // ---------- Forms (PDF / email not built yet) ----------
+    reportForm.addEventListener('submit', e => e.preventDefault());
+    reportForm.addEventListener('reset', () => setTimeout(() => {
+        clearSelection();
+        hideSuggestions();
+        dateTo.min = '';
+        updateDatePreview();
+    }, 0));
+    $('email_form').addEventListener('submit', e => e.preventDefault());
 
-    if (initialCustomer) {
-        customerSearch.value = initialCustomer.value;
-    }
-
+    updateDatePreview();
 });
 </script>
+
+
+@endsection
