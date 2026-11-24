@@ -23,10 +23,12 @@
         @endforelse
     </ul>
 
-    <!-- Pagination Controls -->
-    <div id="pagination-links" class="mt-4">
-        {{ $customers->links() }}
-    </div>
+    @if($customers->hasPages())
+        <div class="mt-4">
+            {{ $customers->onEachSide(1)->links() }}
+        </div>
+    @endif
+
 
 @endsection
 

@@ -47,37 +47,19 @@
                     <input type="hidden" name="customer_sequence" id="customer_sequence">
                 </div>
 
-                <!-- Customer Code & Email Address -->
+                <!-- Customer Code & Report Type -->
                 <div class="grid grid-cols-2 gap-3">
                     <div>
                         <label class="block text-xs font-medium text-gray-600 mb-1">Customer Code</label>
-                        <input
-                            type="text"
-                            id="customer_code"
-                            readonly
-                            placeholder="Select a customer"
-                            class="w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-sm text-gray-600"
-                        >
+                        <input type="text" id="customer_code" readonly placeholder="Select a customer"
+                            class="w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-sm text-gray-600">
                     </div>
                     <div>
-                        <label class="block text-xs font-medium text-gray-600 mb-1">Email Address</label>
-                        <input type="email" name="email" id="email"
-                               class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-800 focus:border-blue-500 focus:outline-none">
-                    </div>
-                </div>
-
-                <!-- Report Type -->
-                <div>
                     <label class="block text-xs font-medium text-gray-600 mb-1">Report Type</label>
-                    <select
-                        name="report_type"
-                        id="report_type"
-                        class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-800 focus:border-blue-500 focus:outline-none"
-                    >
-                        <option value="customer_account_report" selected>Customer Account Report</option>
-                        <option value="invoice_summary">Invoice Summary</option>
-                        <option value="aging_report">Aging Report</option>
-                    </select>
+                        <select name="report_type" id="report_type" class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-800 focus:border-blue-500 focus:outline-none">
+                            <option value="customer_account_report" selected>Customer Account Report</option>
+                        </select>
+                    </div>
                 </div>
 
                 <!-- Date From & Date To (optional filters for the preview) -->

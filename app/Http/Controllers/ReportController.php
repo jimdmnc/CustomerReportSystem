@@ -7,20 +7,20 @@ use App\Http\Controllers\Controller;
 
 class ReportController extends Controller
 {
-    public function __construct(
+   /* public function __construct(
         private CustomerDataInterface $customerData
-    ) {}
+    ) {}*/
 
     public function index()
     {
         // Retrieve customers from the database through the existing service.
-        $customerResults = $this->customerData->searchCustomers('', 100);
+       /* $customerResults = $this->customerData->searchCustomers('', 100);
 
         // Get the customer records as an array for the Blade dropdown.
         $customers = $customerResults->items();
 
         // Use the first customer as the initial PDF Preview customer.
-        $firstCustomer = $customers[0] ?? null;
+        $firstCustomer = $customers[0] ?? null;*/
 
         $customer = (object) [
             'name' => $firstCustomer['customer_name'] ?? '',
