@@ -2,7 +2,7 @@
 document.addEventListener('DOMContentLoaded', function () {
 
     const root = document.getElementById('report-page');
-    const urls = { search: root.dataset.searchUrl, invoices: root.dataset.invoicesUrl, pdf: root.dataset.pdfUrl };
+    const urls = { search: root.dataset.searchUrl, invoices: root.dataset.invoicesUrl, pdf: root.dataset.pdfUrl, email: root.dataset.emailUrl };
 
     const $ = id => document.getElementById(id);
 
@@ -16,6 +16,14 @@ document.addEventListener('DOMContentLoaded', function () {
     const dateFrom         = $('date_from');
     const dateTo           = $('date_to');
     const reportForm       = $('report_form');
+    const emailForm        = $('email_form');
+    const recipientInput   = $('recipient_email');
+    const subjectInput     = $('subject');
+    const messageInput     = $('message');
+    const emailInput       = $('email');
+    const pdfBadge         = $('pdf-filename-badge');
+    const statusEl         = $('report-status');
+    const sendButton       = emailForm.querySelector('button[type="submit"]');
 
     const previewName      = $('preview-customer-name');
     const previewCode      = $('preview-customer-code');
@@ -28,6 +36,7 @@ document.addEventListener('DOMContentLoaded', function () {
     let searchTimer = null;
     let searchAbort = null;
     let invoiceAbort = null;
+    let currentSuggestions = [];   // last search results shown in the dropdown
     let loadedLineCount = 0;      // rows currently shown in the preview
 
     // ---------- Helpers ----------
@@ -88,6 +97,7 @@ document.addEventListener('DOMContentLoaded', function () {
         customerCode.value     = customer.customer_number;
         searchInput.value      = customer.customer_name;
         setCustomerPreview(customer.customer_name, customer.customer_number, '---');
+        subjectInput.value = `Customer Account Report - ${customer.customer_name}`;
         hideSuggestions();
         loadInvoices();
     }
@@ -108,6 +118,13 @@ document.addEventListener('DOMContentLoaded', function () {
             button.addEventListener('click', () => selectCustomer(customer));
             suggestionsList.appendChild(button);
         });
+
+        currentSuggestions = customers;
+
+        // If the typed text is exactly one customer's name, select it automatically.
+        const typed = searchInput.value.trim().toLowerCase();
+        const exact = customers.filter(c => c.customer_name.toLowerCase() === typed);
+        if (exact.length === 1) selectCustomer(exact[0]);
     }
 
     async function runSearch(term) {
@@ -135,7 +152,13 @@ document.addEventListener('DOMContentLoaded', function () {
         searchTimer = setTimeout(() => runSearch(term), 300);
     });
 
-    searchInput.addEventListener('keydown', e => { if (e.key === 'Escape') hideSuggestions(); });
+    searchInput.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') hideSuggestions();
+        if (e.key === 'Enter') {
+            e.preventDefault();   // never submit the form from the search box
+            if (!selectedCustomer && currentSuggestions.length) selectCustomer(currentSuggestions[0]);
+        }
+    });
 
     document.addEventListener('click', function (event) {
         if (!searchInput.contains(event.target) && !suggestionsBox.contains(event.target)) hideSuggestions();
@@ -223,12 +246,12 @@ document.addEventListener('DOMContentLoaded', function () {
         loadInvoices();
     });
 
-    // ---------- Forms (email not built yet) ----------
+    // ---------- Forms ----------
     reportForm.addEventListener('submit', function (event) {
         event.preventDefault();
 
         if (!selectedCustomer) {
-            alert('Please search and select a valid customer.');
+            alert('Please pick a customer from the dropdown list first (the Customer Code field must be filled).');
             searchInput.focus();
             return;
         }
@@ -249,7 +272,83 @@ document.addEventListener('DOMContentLoaded', function () {
         dateTo.min = '';
         updateDatePreview();
     }, 0));
-    $('email_form').addEventListener('submit', e => e.preventDefault());
+
+    // ---------- Email Management ----------
+    const statusTones = {
+        pending: 'bg-amber-100 text-amber-800',
+        sending: 'bg-blue-100 text-blue-800',
+        sent:    'bg-green-100 text-green-800',
+        failed:  'bg-red-100 text-red-800',
+    };
+
+    function setStatus(text, tone) {
+        statusEl.textContent = text;
+        statusEl.className = `inline-block font-semibold px-2 py-0.5 rounded ${statusTones[tone]}`;
+    }
+
+    // Convenience: copy the Email Address from Report Details into Recipient when it is empty.
+    emailInput.addEventListener('change', () => {
+        if (!recipientInput.value.trim()) recipientInput.value = emailInput.value.trim();
+    });
+
+    emailForm.addEventListener('submit', async function (event) {
+        event.preventDefault();
+
+        if (!selectedCustomer) {
+            alert('Please pick a customer from the dropdown list first (the Customer Code field must be filled).');
+            searchInput.focus();
+            return;
+        }
+        if (loadedLineCount === 0) {
+            alert('There are no invoice records to send for this selection.');
+            return;
+        }
+        if (!recipientInput.value.trim()) {
+            alert('Please enter the recipient email.');
+            recipientInput.focus();
+            return;
+        }
+
+        const payload = {
+            customer_name:   selectedCustomer.customer_name,
+            recipient_email: recipientInput.value.trim(),
+            subject:         subjectInput.value.trim() || `Customer Account Report - ${selectedCustomer.customer_name}`,
+            message:         messageInput.value.trim(),
+        };
+        if (dateFrom.value) payload.date_from = dateFrom.value;
+        if (dateTo.value)   payload.date_to   = dateTo.value;
+
+        sendButton.disabled = true;
+        setStatus('Sending...', 'sending');
+
+        try {
+            const response = await fetch(urls.email, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': emailForm.querySelector('input[name="_token"]').value,
+                },
+                body: JSON.stringify(payload),
+            });
+
+            const result = await response.json().catch(() => ({}));
+
+            if (!response.ok) {
+                const firstError = result.errors ? Object.values(result.errors)[0][0] : null;
+                throw new Error(firstError || result.message || `Request failed (${response.status})`);
+            }
+
+            pdfBadge.textContent = result.file_name;
+            setStatus('Sent', 'sent');
+        } catch (error) {
+            setStatus('Failed', 'failed');
+            alert(error.message);
+        } finally {
+            sendButton.disabled = false;
+        }
+    });
 
     updateDatePreview();
 });

@@ -33,5 +33,5 @@
 @endsection
 
 @push('scripts')
-    @vite('resources/js/pages/customers.js')
+    @vite('resources/js/customers.js')
 @endpush

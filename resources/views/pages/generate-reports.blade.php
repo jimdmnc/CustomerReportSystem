@@ -8,6 +8,7 @@
          data-search-url="{{ route('reports.customers.search') }}"
          data-invoices-url="{{ route('reports.invoices.preview') }}"
          data-pdf-url="{{ route('reports.pdf') }}"
+         data-email-url="{{ route('reports.email') }}"
          class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
 
     <!-- Report Request & Email Management -->
@@ -24,14 +25,19 @@
                 <div class="relative">
                     <label class="block text-xs font-medium text-gray-600 mb-1">Customer</label>
 
-                    <input type="text" id="customer_search" placeholder="Search customer name or code..." autocomplete="off"
+                    <input
+                        type="text"
+                        id="customer_search"
+                        placeholder="Search customer name or code..."
+                        autocomplete="off"
                         class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-800 focus:border-blue-500 focus:outline-none"
                     >
 
-                    <!-- Search Results-->
+                    <!-- Search Results (filled by JS from the server) -->
                     <div
                         id="customer_suggestions"
-                        class="absolute z-50 mt-1 hidden w-full overflow-hidden rounded-lg border border-gray-200 bg-white shadow-lg">
+                        class="absolute z-50 mt-1 hidden w-full overflow-hidden rounded-lg border border-gray-200 bg-white shadow-lg"
+                    >
                         <div id="customer_suggestions_list" class="max-h-60 overflow-y-auto"></div>
 
                         <div id="customer_status" class="hidden px-3 py-3 text-center text-sm text-gray-500"></div>
@@ -42,24 +48,38 @@
                     <input type="hidden" name="customer_sequence" id="customer_sequence">
                 </div>
 
-                <!-- Customer Code & Report Type -->
-                <div class="flex items-end gap-2">
-                    <div class="w-24 shrink-0">
-                        <label class="block text-xs font-medium text-gray-600 mb-1 whitespace-nowrap">Customer Code</label>
-                        <input type="text" id="customer_code" readonly placeholder="Code"
-                            class="w-full rounded-lg border border-gray-300 bg-gray-50 px-2.5 py-2 text-xs text-gray-600">
+                <!-- Customer Code & Email Address -->
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-medium text-gray-600 mb-1">Customer Code</label>
+                        <input
+                            type="text"
+                            id="customer_code"
+                            readonly
+                            placeholder="Select a customer"
+                            class="w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-sm text-gray-600"
+                        >
                     </div>
-
-                    <div class="flex-1 min-w-0">
-                        <label class="block text-xs font-medium text-gray-600 mb-1">Report Type</label>
-                        <select name="report_type" id="report_type"
-                            class="w-full rounded-lg border border-gray-300 bg-white px-2.5 py-2 text-xs text-gray-800 focus:border-blue-500 focus:outline-none">
-                            <option value="customer_account_report" selected>Customer Account Report</option>
-                        </select>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-600 mb-1">Email Address</label>
+                        <input type="email" name="email" id="email"
+                               class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-800 focus:border-blue-500 focus:outline-none">
                     </div>
                 </div>
 
-
+                <!-- Report Type -->
+                <div>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Report Type</label>
+                    <select
+                        name="report_type"
+                        id="report_type"
+                        class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-800 focus:border-blue-500 focus:outline-none"
+                    >
+                        <option value="customer_account_report" selected>Customer Account Report</option>
+                        <option value="invoice_summary">Invoice Summary</option>
+                        <option value="aging_report">Aging Report</option>
+                    </select>
+                </div>
 
                 <!-- Date From & Date To (optional filters for the preview) -->
                 <div class="grid grid-cols-2 gap-3">
@@ -89,7 +109,7 @@
             </form>
         </div>
 
-        <!-- Card 2: Email Management -->
+        <!-- Card 2: Email Management (not wired to a backend yet) -->
         <div class="card bg-white rounded-xl shadow-sm p-6">
             <h2 class="text-base font-bold text-gray-900 mb-4">Email Management</h2>
 
@@ -197,7 +217,8 @@
     </div>
 </div>
 
-
 @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+
 
 @endsection

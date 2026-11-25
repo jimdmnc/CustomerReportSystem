@@ -4,6 +4,7 @@ use App\Http\Controllers\Reports\CustomerSearchController;
 use App\Http\Controllers\Reports\ReportPageController;
 use App\Http\Controllers\Reports\InvoicePreviewController;
 use App\Http\Controllers\Reports\GenerateReportPdfController;
+use App\Http\Controllers\Reports\SendReportEmailController;
 
 use App\Http\Controllers\CustomersController;
 use Illuminate\Support\Facades\Route;
@@ -25,4 +26,8 @@ Route::prefix('generate-reports')->name('reports.')->group(function () {
     
     Route::get('/pdf', GenerateReportPdfController::class)
         ->name('pdf');
+
+         Route::post('/email', SendReportEmailController::class)                          // NEW
+        ->middleware('throttle:10,1')
+        ->name('email');
 });
