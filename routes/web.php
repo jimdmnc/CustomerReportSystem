@@ -1,23 +1,13 @@
 <?php
 
 use App\Http\Controllers\Reports\CustomerSearchController;
-use App\Http\Controllers\Reports\ReportPageController;
 use App\Http\Controllers\Reports\InvoicePreviewController;
 use App\Http\Controllers\Reports\GenerateReportPdfController;
 use App\Http\Controllers\Reports\SendReportEmailController;
-
-use App\Http\Controllers\CustomersController;
 use Illuminate\Support\Facades\Route;
 
-// Customers page
-Route::view('/customers', 'pages.customers') ->name('customers');
-Route::get('/customers', [CustomersController::class, 'index'])->name('customers');
-
-
-// Generate Reports
+// API / Data Endpoints (Keep these above the catch-all route)
 Route::prefix('generate-reports')->name('reports.')->group(function () {
-    Route::get('/', ReportPageController::class)->name('index');
-
     Route::get('/customers/search', CustomerSearchController::class)
         ->name('customers.search');
     
@@ -27,7 +17,12 @@ Route::prefix('generate-reports')->name('reports.')->group(function () {
     Route::get('/pdf', GenerateReportPdfController::class)
         ->name('pdf');
 
-         Route::post('/email', SendReportEmailController::class)                          // NEW
+    Route::post('/email', SendReportEmailController::class)
         ->middleware('throttle:10,1')
         ->name('email');
-});
+}); // <-- The generate-reports group MUST close here
+
+// Catch-all route: MUST be outside the group at the very bottom
+Route::get('/{any?}', function () {
+    return view('app'); // Make sure 'app.blade.php' exists in resources/views/
+})->where('any', '.*');
